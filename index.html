@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>学习笔记</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@5/github-markdown-light.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/styles/github.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { display: flex; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; }
+
+    /* 侧边栏 */
+    .sidebar {
+      width: 280px;
+      min-width: 280px;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      padding: 24px 0;
+      overflow-y: auto;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      z-index: 10;
+      transition: transform 0.3s;
+    }
+    .sidebar-header {
+      padding: 0 24px 20px;
+      border-bottom: 1px solid #313244;
+      margin-bottom: 12px;
+    }
+    .sidebar-header h1 {
+      font-size: 20px;
+      color: #cdd6f4;
+      font-weight: 600;
+    }
+    .sidebar-header p {
+      font-size: 13px;
+      color: #6c7086;
+      margin-top: 4px;
+    }
+    .nav-group { margin-bottom: 8px; }
+    .nav-group-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: #585b70;
+      padding: 8px 24px 4px;
+      font-weight: 600;
+    }
+    .nav-item {
+      display: block;
+      padding: 8px 24px;
+      color: #a6adc8;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      border-left: 3px solid transparent;
+    }
+    .nav-item:hover {
+      background: #313244;
+      color: #cdd6f4;
+    }
+    .nav-item.active {
+      background: #313244;
+      color: #89b4fa;
+      border-left-color: #89b4fa;
+    }
+
+    /* 主内容区 */
+    .main {
+      flex: 1;
+      margin-left: 280px;
+      display: flex;
+      justify-content: center;
+    }
+    .content {
+      max-width: 860px;
+      width: 100%;
+      padding: 40px 48px 80px;
+    }
+    .markdown-body {
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .markdown-body h1 { border-bottom: 2px solid #e1e4e8; padding-bottom: 12px; }
+    .markdown-body h2 { margin-top: 32px; }
+    .markdown-body h3 { margin-top: 24px; }
+    .markdown-body table { display: table; width: 100%; }
+    .markdown-body blockquote {
+      border-left: 4px solid #89b4fa;
+      background: #f0f6ff;
+      padding: 12px 16px;
+      margin: 16px 0;
+    }
+    .markdown-body pre { border-radius: 8px; }
+    .markdown-body code { font-size: 13.5px; }
+
+    /* 加载状态 */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60vh;
+      color: #6c7086;
+      font-size: 15px;
+    }
+    .loading::before {
+      content: '';
+      width: 20px; height: 20px;
+      border: 2px solid #e1e4e8;
+      border-top-color: #89b4fa;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 移动端菜单按钮 */
+    .menu-btn {
+      display: none;
+      position: fixed;
+      top: 16px; left: 16px;
+      z-index: 20;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      border: none;
+      border-radius: 8px;
+      width: 40px; height: 40px;
+      font-size: 20px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* 搜索框 */
+    .search-box {
+      padding: 0 16px 12px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 8px 12px;
+      background: #313244;
+      border: 1px solid #45475a;
+      border-radius: 6px;
+      color: #cdd6f4;
+      font-size: 13px;
+      outline: none;
+    }
+    .search-box input::placeholder { color: #585b70; }
+    .search-box input:focus { border-color: #89b4fa; }
+
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .menu-btn { display: flex; align-items: center; justify-content: center; }
+      .main { margin-left: 0; }
+      .content { padding: 60px 20px 40px; }
+    }
+  </style>
+</head>
+<body>
+  <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>📚 学习笔记</h1>
+      <p>Agentic 工程模式</p>
+    </div>
+    <div class="search-box">
+      <input type="text" id="search" placeholder="搜索文档..." oninput="filterDocs(this.value)">
+    </div>
+    <div id="nav-list"></div>
+  </nav>
+  <main class="main">
+    <article class="content">
+      <div class="markdown-body" id="doc-content">
+        <div class="loading">正在加载文档...</div>
+      </div>
+    </article>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked@14/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/python.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11/build/languages/bash.min.js"></script>
+  <script>
+    // 文档注册表 — 添加新文档在这里
+    const docs = [
+      {
+        group: 'Agentic 工程',
+        items: [
+          { file: 'docs/agentic-guide.md', title: '实践指南' },
+        ]
+      },
+      // 添加更多文档组：
+      // { group: '其他主题', items: [
+      //   { file: 'docs/other.md', title: '其他文档' },
+      // ]}
+    ];
+
+    // marked 配置
+    marked.setOptions({
+      highlight: function(code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
+      },
+      breaks: false,
+      gfm: true
+    });
+
+    // 构建导航
+    function buildNav() {
+      const nav = document.getElementById('nav-list');
+      let html = '';
+      docs.forEach(group => {
+        html += '<div class="nav-group">';
+        html += '<div class="nav-group-title">' + group.group + '</div>';
+        group.items.forEach(item => {
+          html += '<a class="nav-item" data-file="' + item.file + '" data-title="' + item.title + '" onclick="loadDoc(\'' + item.file + '\', this)">' + item.title + '</a>';
+        });
+        html += '</div>';
+      });
+      nav.innerHTML = html;
+    }
+
+    // 加载文档
+    async function loadDoc(file, el) {
+      document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
+      if (el) el.classList.add('active');
+      const title = el ? el.dataset.title : '';
+      document.title = title ? title + ' - 学习笔记' : '学习笔记';
+      const content = document.getElementById('doc-content');
+      content.innerHTML = '<div class="loading">正在加载文档...</div>';
+      try {
+        const resp = await fetch(file);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const md = await resp.text();
+        content.innerHTML = marked.parse(md);
+        window.scrollTo(0, 0);
+        if (window.innerWidth <= 768) {
+          document.getElementById('sidebar').classList.remove('open');
+        }
+        history.replaceState(null, '', '#' + file);
+      } catch (e) {
+        content.innerHTML = '<h2>📄 文档加载失败</h2><p>无法加载 <code>' + file + '</code></p><p>错误：' + e.message + '</p>';
+      }
+    }
+
+    // 搜索过滤
+    function filterDocs(query) {
+      const items = document.querySelectorAll('.nav-item');
+      const q = query.toLowerCase();
+      items.forEach(item => {
+        item.style.display = item.dataset.title.toLowerCase().includes(q) ? '' : 'none';
+      });
+    }
+
+    // 移动端切换侧边栏
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // 初始化
+    buildNav();
+    const hash = location.hash.slice(1);
+    const first = document.querySelector('.nav-item');
+    if (hash) {
+      const target = document.querySelector('[data-file="' + hash + '"]');
+      loadDoc(hash, target || first);
+    } else if (first) {
+      loadDoc(first.dataset.file, first);
+    }
+  </script>
+</body>
+</html>
